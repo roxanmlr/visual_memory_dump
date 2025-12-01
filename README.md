@@ -356,9 +356,62 @@ Stack:
 
 ## Graphical User Interface
 
-The library includes an interactive GUI for visualizing memory snapshots.
+The library includes two GUI options:
 
-### Launching the GUI
+### 1. Visualization GUI (View Mode)
+For viewing pre-created snapshot sequences.
+
+### 2. Interactive Simulator (Edit Mode) ⭐ NEW
+**Directly manipulate memory through GUI buttons!**
+
+## Interactive Memory Simulator
+
+The Interactive Simulator lets you perform memory operations through GUI buttons and see real-time updates.
+
+### Quick Start
+
+```bash
+python interactive_gui.py
+```
+
+### Available Operations
+
+**Stack:**
+- 🔼 Push Frame - Add function call
+- 🔽 Pop Frame - Return from function
+- ➕ Add Local/Parameter - Create variables
+- ✏️ Modify Variable - Change values
+
+**Heap:**
+- 🆕 Malloc - Allocate memory
+- 🗑️ Free - Deallocate memory
+- ✏️ Write to Heap - Modify heap data
+
+**Globals:**
+- ➕ Add Global - Create global variable
+- ✏️ Modify Global - Change global value
+
+**History:**
+- ⬅️ Undo / ➡️ Redo - Navigate operations
+- 🔄 Reset - Start over
+- Click history items to jump to any state
+
+### Interactive Tutorial
+
+Simulate `int x = 10; int* ptr = malloc(4);`:
+
+1. Click "Push Frame" → Enter "main"
+2. Click "Add Local" → Name: x, Type: int, Value: 10
+3. Click "Malloc" → Size: 4, Type: int → Note address
+4. Click "Add Local" → Name: ptr, Type: int*, Value: 0x1000
+
+See [INTERACTIVE_GUI.md](INTERACTIVE_GUI.md) for complete guide.
+
+## Visualization GUI (Snapshot Viewer)
+
+For viewing pre-created snapshot sequences:
+
+### Launching the Visualization GUI
 
 ```python
 from memory_gui import visualize_snapshots
