@@ -427,11 +427,13 @@ visualize_snapshots(snapshots)
 
 - **Step Navigation**: Navigate through snapshots using buttons, keyboard, or slider
 - **Interactive Details**: Click on memory items to see detailed information
+- **Pointer Arrows**: Visual arrows showing pointer relationships (red arrows from pointer to target) 🆕
 - **Color-Coded Visualization**:
   - Stack frames in blue
   - Heap blocks in purple (freed blocks in gray)
   - Global variables in green
   - CPU registers in yellow
+  - Pointer arrows in red
 - **Memory Layout**: Visual representation of stack, heap, and global segments
 - **Export**: Save visualizations as PostScript files
 - **Real-time Updates**: See memory state changes step-by-step

@@ -95,10 +95,15 @@ class MemoryRenderer:
         # Keep track of drawn items for interaction
         self.item_map: Dict[int, Tuple[str, Any]] = {}  # canvas_id -> (type, object)
 
+        # Keep track of item positions for pointer arrows
+        # address -> (x, y, width, height) bounding box
+        self.item_positions: Dict[int, Tuple[int, int, int, int]] = {}
+
     def clear(self) -> None:
         """Clear the canvas."""
         self.canvas.delete("all")
         self.item_map.clear()
+        self.item_positions.clear()
 
     def render_snapshot(self, snapshot: MemorySnapshot) -> None:
         """Render a complete memory snapshot.
@@ -436,6 +441,9 @@ class MemoryRenderer:
             fill=self.colors.TEXT,
         )
 
+        # Track position for pointer arrows
+        self.item_positions[block.address] = (x, y, self.region_width, self.item_height)
+
         return self.item_height
 
     def _render_cpu(self, cpu, x: int, y: int) -> int:
@@ -547,13 +555,74 @@ class MemoryRenderer:
             fill=self.colors.BORDER,
         )
 
+        # Track position for pointer arrows
+        self.item_positions[address] = (x, y, box_width, self.item_height)
+
         return self.item_height
 
     def _render_pointers(self, snapshot: MemorySnapshot) -> None:
         """Render pointer arrows connecting memory locations."""
-        # This is a simplified version - could be enhanced with better arrow routing
-        # For now, we'll skip detailed pointer rendering to keep it simple
-        pass
+        # Collect all pointers: (source_address, target_address, pointer_value)
+        pointers: List[Tuple[int, int, PointerValue]] = []
+
+        # Check globals
+        for var in snapshot.globals_statics.variables.values():
+            if isinstance(var.value, PointerValue) and not var.value.is_null:
+                pointers.append((var.address, var.value.address, var.value))
+
+        # Check stack
+        for frame in snapshot.stack.frames:
+            for var in frame.all_variables().values():
+                if isinstance(var.value, PointerValue) and not var.value.is_null:
+                    pointers.append((var.address, var.value.address, var.value))
+
+        # Check heap
+        for block in snapshot.heap.blocks.values():
+            if not block.is_freed and isinstance(block.value, PointerValue) and not block.value.is_null:
+                pointers.append((block.address, block.value.address, block.value))
+
+        # Draw arrows for pointers that have both source and target positions
+        for src_addr, tgt_addr, ptr_val in pointers:
+            if src_addr in self.item_positions and tgt_addr in self.item_positions:
+                self._draw_arrow(src_addr, tgt_addr)
+
+    def _draw_arrow(self, from_addr: int, to_addr: int) -> None:
+        """Draw an arrow from one address to another.
+
+        Args:
+            from_addr: Source address
+            to_addr: Target address
+        """
+        # Get positions
+        src_x, src_y, src_w, src_h = self.item_positions[from_addr]
+        tgt_x, tgt_y, tgt_w, tgt_h = self.item_positions[to_addr]
+
+        # Calculate arrow start and end points
+        # Start from right edge of source
+        start_x = src_x + src_w
+        start_y = src_y + src_h // 2
+
+        # End at left edge of target (or top if in same column)
+        if tgt_x > src_x + src_w + 20:  # Target is to the right
+            end_x = tgt_x
+            end_y = tgt_y + tgt_h // 2
+        else:  # Target is below or overlapping
+            end_x = tgt_x + tgt_w // 2
+            end_y = tgt_y
+
+        # Draw the arrow line
+        arrow_id = self.canvas.create_line(
+            start_x, start_y,
+            end_x, end_y,
+            arrow=tk.LAST,
+            fill=self.colors.POINTER_ARROW,
+            width=2,
+            smooth=True,
+            arrowshape=(10, 12, 5)
+        )
+
+        # Lower the arrow so it's behind other items
+        self.canvas.tag_lower(arrow_id)
 
     def _format_value(self, value: Any) -> str:
         """Format a value for display."""
