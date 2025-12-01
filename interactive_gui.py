@@ -184,18 +184,15 @@ class InteractiveMemorySimulator:
         self.history: List[MemorySnapshot] = []
         self.current_index = -1
 
-        # Create initial snapshot
-        initial = create_initial_snapshot(step_id=0, description="Initial state")
-        self._add_snapshot(initial)
-
         # Color scheme
         self.colors = ColorScheme()
 
-        # Create UI
+        # Create UI first (needed for renderer)
         self._create_ui()
 
-        # Render initial state
-        self.refresh_display()
+        # Create and add initial snapshot
+        initial = create_initial_snapshot(step_id=0, description="Initial state")
+        self._add_snapshot(initial)
 
     def _create_ui(self):
         """Create the user interface."""
