@@ -8,6 +8,7 @@ A Python library for modeling and visualizing the memory state of C programs. Th
 - 🏗️ **Immutable Snapshots**: Create memory snapshots with full state preservation
 - 🔨 **Builder Pattern**: Fluent API for constructing memory states
 - 🎨 **Console Rendering**: Built-in console visualization with customizable output
+- 🖼️ **Graphical UI**: Interactive GUI for visualizing memory states (tkinter-based)
 - 🔍 **Memory Analysis**: Find pointers, detect leaks, and track allocations
 - 📝 **Type System**: Support for structs, unions, and typedefs
 - 🧪 **Comprehensive Tests**: Extensive test coverage
@@ -21,6 +22,12 @@ cd visual_memory_dump
 
 # Install dependencies (for testing)
 pip install pytest
+
+# For GUI support (optional)
+# tkinter usually comes with Python, but on some Linux systems:
+# Ubuntu/Debian: sudo apt-get install python3-tk
+# Fedora: sudo dnf install python3-tkinter
+# macOS/Windows: tkinter is included with Python
 ```
 
 ## Quick Start
@@ -345,6 +352,87 @@ Stack:
   + Pushed frame: main
 
 (other changes...)
+```
+
+## Graphical User Interface
+
+The library includes an interactive GUI for visualizing memory snapshots.
+
+### Launching the GUI
+
+```python
+from memory_gui import visualize_snapshots
+
+# Create your snapshots
+snapshots = [snapshot0, snapshot1, snapshot2, ...]
+
+# Launch the GUI
+visualize_snapshots(snapshots)
+```
+
+### GUI Features
+
+- **Step Navigation**: Navigate through snapshots using buttons, keyboard, or slider
+- **Interactive Details**: Click on memory items to see detailed information
+- **Color-Coded Visualization**:
+  - Stack frames in blue
+  - Heap blocks in purple (freed blocks in gray)
+  - Global variables in green
+  - CPU registers in yellow
+- **Memory Layout**: Visual representation of stack, heap, and global segments
+- **Export**: Save visualizations as PostScript files
+- **Real-time Updates**: See memory state changes step-by-step
+
+### GUI Demo
+
+Run the included demo:
+
+```bash
+python gui_demo.py
+```
+
+This demo simulates a C program with:
+- Global variables
+- Linked list allocation on heap
+- Function calls with parameters
+- Pointer manipulation
+- Memory freeing
+
+### GUI Controls
+
+- **First/Last**: Jump to first or last snapshot
+- **Previous/Next**: Navigate one step at a time
+- **Slider**: Jump to any step quickly
+- **Click**: Click on memory items for details
+- **Export**: Save current view as image
+
+### Screenshot Description
+
+The GUI displays three columns:
+1. **Left**: Global/Static variables and CPU state
+2. **Center**: Stack frames with parameters and locals
+3. **Right**: Heap allocations
+
+Each memory item shows:
+- Variable/block name
+- Type information
+- Memory address
+- Current value
+
+### MemoryVisualizer Class
+
+For more control, use the `MemoryVisualizer` class directly:
+
+```python
+from memory_gui import MemoryVisualizer
+
+visualizer = MemoryVisualizer(snapshots)
+
+# Customize if needed
+visualizer.colors.STACK_BG = "#YOUR_COLOR"
+
+# Run
+visualizer.run()
 ```
 
 ## Configuration
